@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Safe Start — Clickable Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cherry:#990011;--cherry-dark:#6E0A18;--ink:#1A1A1A;--muted:#7A6E71;
+    --tint:#FCF6F5;--line:#EBE3E1;--green:#2C5F2D;--green-soft:#EAF3EA;
+    --ui:'Inter',-apple-system,sans-serif;--disp:'Fraunces',Georgia,serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:radial-gradient(1200px 700px at 50% -10%,#7d0d1c 0%,#4a0912 55%,#360810 100%);
+    font-family:var(--ui);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:18px}
+
+  .head{text-align:center;color:#fff}
+  .head h1{font-family:var(--disp);font-size:22px;font-weight:700}
+  .head p{font-size:12.5px;color:#EBC3C9;margin-top:3px}
+
+  .device-tag{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#EBC3C9;
+    display:flex;align-items:center;gap:8px;min-height:16px}
+
+  .phone{width:390px;max-width:94vw;background:#fff;border-radius:40px;
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.6),0 0 0 10px rgba(255,255,255,.06);overflow:hidden;position:relative}
+  .notch{height:36px;display:flex;align-items:center;justify-content:center}
+  .notch::after{content:"";width:120px;height:9px;background:#EEE7E6;border-radius:99px}
+  .screen{min-height:600px;display:flex;flex-direction:column;padding:6px 24px 26px;position:relative}
+  .tapzone{position:absolute;inset:0;cursor:pointer;z-index:0}
+
+  .progress{display:flex;gap:6px;justify-content:center}
+  .progress i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.28);transition:.2s}
+  .progress i.on{background:#fff;width:20px;border-radius:99px}
+
+  .foot{display:flex;gap:14px;align-items:center}
+  .foot button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
+    font-family:var(--ui);font-size:12.5px;font-weight:600;padding:9px 18px;border-radius:99px;cursor:pointer;transition:.15s}
+  .foot button:hover{background:rgba(255,255,255,.22)}
+  .hint{color:#EBC3C9;font-size:11.5px}
+
+  /* ---- phone UI ---- */
+  .yt-head{display:flex;align-items:center;gap:8px;padding:8px 0 16px;position:relative;z-index:1}
+  .yt-logo{width:30px;height:21px;background:var(--cherry);border-radius:6px;position:relative}
+  .yt-logo::after{content:"";position:absolute;left:12px;top:6px;border-left:8px solid #fff;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent}
+  .yt-head b{font-size:15px}
+  .yt-head .kids{font-size:15px;color:var(--cherry);font-weight:700;margin-left:-4px}
+  .yt-head .mode{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.08em;color:var(--green);background:var(--green-soft);padding:4px 9px;border-radius:99px;text-transform:uppercase}
+
+  .body{flex:1;position:relative;z-index:1}
+  .title{font-family:var(--disp);font-size:22px;font-weight:700;line-height:1.25;margin-bottom:8px}
+  .sub{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+  .foot-in{margin-top:18px;position:relative;z-index:1}
+
+  .btn{display:block;width:100%;border:none;border-radius:12px;padding:14px;font-size:14.5px;font-weight:600;text-align:center;cursor:pointer;font-family:var(--ui)}
+  .btn.primary{background:var(--cherry);color:#fff}
+  .btn.primary:hover{background:var(--cherry-dark)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);margin-top:10px}
+  .btn.ghost:hover{border-color:var(--cherry);color:var(--cherry)}
+
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px}
+  .field .inp{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--ink)}
+
+  .pill{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:99px;margin-bottom:14px;background:var(--tint);color:var(--cherry)}
+
+  .choice{display:flex;align-items:center;gap:14px;border:1.5px solid var(--line);border-radius:14px;padding:15px;background:#fff;text-align:left;font-size:14.5px;font-weight:600;color:var(--ink);width:100%;margin-bottom:11px;cursor:pointer;font-family:var(--ui)}
+  .choice:hover{border-color:var(--cherry)}
+  .choice .ico{width:40px;height:40px;border-radius:10px;background:var(--tint);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+  .choice small{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
+
+  .success-mark{width:64px;height:64px;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:30px;display:flex;align-items:center;justify-content:center;margin:24px auto 16px}
+  .center{text-align:center}
+
+  .otp{display:flex;gap:8px;justify-content:center;margin:10px 0}
+  .otp span{width:40px;height:50px;border:1.5px solid var(--cherry);background:var(--tint);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+
+  .trow{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .trow:last-of-type{border-bottom:none}
+  .trow .tt{flex:1}
+  .trow .tt b{font-size:13.5px;display:block;margin-bottom:2px}
+  .trow .tt span{font-size:11.5px;color:var(--muted);line-height:1.45;display:block}
+  .sw{position:relative;width:44px;height:26px;flex-shrink:0;margin-top:2px}
+  .sw input{opacity:0;width:0;height:0}
+  .sw .tk{position:absolute;inset:0;background:#DDD3D1;border-radius:99px;transition:.18s;cursor:pointer}
+  .sw .tk::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .sw input:checked + .tk{background:var(--green)}
+  .sw input:checked + .tk::after{transform:translateX(18px)}
+  .sw input:disabled + .tk{opacity:.5}
+
+  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .vid{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .vid .thumb{height:72px;display:flex;align-items:center;justify-content:center;font-size:26px}
+  .vid p{font-size:11.5px;font-weight:600;padding:8px 10px;line-height:1.35}
+
+  .dcard{border:1.5px solid var(--line);border-radius:14px;padding:15px;margin-bottom:13px}
+  .dcard h4{font-size:13px;margin-bottom:9px;display:flex;justify-content:space-between}
+  .dcard h4 .st{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
+  .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border-bottom:none}
+  .kv span:first-child{color:var(--muted)}
+  .kv span:last-child{font-weight:600}
+  .kv .lk{color:var(--cherry);text-decoration:underline;cursor:pointer}
+
+  @media(max-height:820px){.screen{min-height:560px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>YouTube Safe Start</h1>
+    <p>Clickable prototype · DPDP verifiable parental consent · tap to advance</p>
+  </div>
+
+  <div class="device-tag" id="deviceTag"></div>
+
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen" id="screen"></div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <div class="foot">
+    <button id="back">← Back</button>
+    <span class="hint" id="hint">Tap the button, or anywhere on the screen</span>
+    <button id="restart">↺ Restart</button>
+  </div>
+
+<script>
+const screen=document.getElementById("screen");
+const deviceTag=document.getElementById("deviceTag");
+const progress=document.getElementById("progress");
+const st={search:true,recs:false,voice:true};
+
+function head(kids,mode){return `<div class="yt-head"><div class="yt-logo"></div><b>YouTube</b>${kids?'<span class="kids">Kids</span>':""}${mode?`<span class="mode">${mode}</span>`:""}</div>`;}
+
+/* each screen: {device, html, tap(next)} — tap() advances to next index by default */
+const screens=[
+ // 0 create account
+ {device:"Kid's device",html:()=>head()+`
+   <div class="body">
+     <div class="title">Create your account</div>
+     <div class="sub">Being honest here makes setup easier — you won't be blocked.</div>
+     <div class="field"><label>Name</label><div class="inp">Aarav</div></div>
+     <div class="field"><label>Year of birth</label><div class="inp">2014</div></div>
+   </div>
+   <div class="foot-in"><button class="btn primary" data-next>Continue</button></div>`},
+
+ // 1 ask a parent
+ {device:"Kid's device",html:()=>head()+`
+   <div class="body">
+     <span class="pill">You're 12</span>
+     <div class="title">Let's get a parent to unlock your account</div>
+     <div class="sub">Because you're under 18, a parent must say yes before YouTube can use your data. Takes about 2 minutes.</div>
+     <div class="field"><label>Parent's phone number</label><div class="inp">98•••• ••41</div></div>
+   </div>
+   <div class="foot-in"><button class="btn primary" data-next>Send link to parent</button></div>`},
+
+ // 2 link sent
+ {device:"Kid's device",html:()=>head()+`
+   <div class="body center">
+     <div class="success-mark">✓</div>
+     <div class="title">Link sent</div>
+     <div class="sub">We've messaged your parent on WhatsApp and SMS. Until they say yes, YouTube collects nothing about you.</div>
+   </div>
+   <div class="foot-in"><button class="btn primary" data-next>Switch to parent's phone →</button></div>`},
+
+ // 3 parent verify choice
+ {device:"Parent's device",html:()=>head()+`
+   <div class="body">
+     <div class="title">Aarav (12) wants to use YouTube</div>
+     <div class="sub">First, confirm you're an adult and their parent. Choose how to verify:</div>
+     <button class="choice" data-next><span class="ico">🪪</span><span>Verify with DigiLocker<small>Government-linked ID token. We see a yes/no, not your documents.</small></span></button>
+     <button class="choice" data-goto="5"><span class="ico">💬</span><span>OTP on my verified number<small>For telecom age-verified numbers.</small></span></button>
+   </div>`},
+
+ // 4 DigiLocker
+ {device:"Parent's device",html:()=>head()+`
+   <div class="body center">
+     <span class="pill">DigiLocker</span>
+     <div class="title">Confirm with DigiLocker</div>
+     <div class="sub">Only an age & identity token is shared. Your documents never reach YouTube.</div>
+     <div class="dcard" style="text-align:left">
+       <div class="kv"><span>Verified name</span><span>Ritu S.</span></div>
+       <div class="kv"><span>Age check</span><span style="color:var(--green)">Over 18 ✓</span></div>
+       <div class="kv"><span>Shared with YouTube</span><span>Token only</span></div>
+     </div>
+   </div>
+   <div class="foot-in"><button class="btn primary" data-goto="6">Approve & continue</button></div>`},
+
+ // 5 OTP
+ {device:"Parent's device",html:()=>head()+`
+   <div class="body center">
+     <span class="pill">One-time code</span>
+     <div class="title">Enter the code we sent</div>
+     <div class="sub">Sent to 98•••• ••41</div>
+     <div class="otp"><span>4</span><span>8</span><span>2</span><span>9</span><span>1</span><span>7</span></div>
+   </div>
+   <div class="foot-in"><button class="btn primary" data-next>Verify</button></div>`},
+
+ // 6 itemized consent
+ {device:"Parent's device",html:()=>head()+`
+   <div class="body">
+     <div class="title" style="font-size:19px">Your consent, item by item</div>
+     <div class="sub" style="margin-bottom:12px">Change or withdraw anytime — one tap.</div>
+     <div class="trow"><div class="tt"><b>Search</b><span>Search approved videos. Off = verified channels only.</span></div><label class="sw"><input type="checkbox" id="cSearch" ${st.search?"checked":""}><span class="tk"></span></label></div>
+     <div class="trow"><div class="tt"><b>Watch history for recommendations</b><span>Default off for under-18s.</span></div><label class="sw"><input type="checkbox" id="cRecs" ${st.recs?"checked":""}><span class="tk"></span></label></div>
+     <div class="trow"><div class="tt"><b>Voice search</b><span>Audio processed, then deleted immediately.</span></div><label class="sw"><input type="checkbox" id="cVoice" ${st.voice?"checked":""}><span class="tk"></span></label></div>
+     <div class="trow"><div class="tt"><b>Personalised ads</b><span>Never shown to under-18s, by law.</span></div><label class="sw"><input type="checkbox" disabled><span class="tk"></span></label></div>
+     <div style="font-size:11px;color:var(--muted);margin-top:12px">Grievance contact · resolved within 90 days</div>
+   </div>
+   <div class="foot-in"><button class="btn primary" id="giveConsent">I give consent</button></div>`,
+  after:()=>{
+    document.getElementById("giveConsent").addEventListener("click",e=>{e.stopPropagation();
+      st.search=document.getElementById("cSearch").checked;
+      st.recs=document.getElementById("cRecs").checked;
+      st.voice=document.getElementById("cVoice").checked; goto(7);});
+    // stop taps on toggles from advancing
+    screen.querySelectorAll(".sw").forEach(s=>s.addEventListener("click",e=>e.stopPropagation()));
+  }},
+
+ // 7 account active
+ {device:"Parent's device",html:()=>head()+`
+   <div class="body center">
+     <div class="success-mark">✓</div>
+     <div class="title">Aarav's account is active</div>
+     <div class="sub">Supervised Mode is on: contextual ads only, ${st.recs?"recommendations on (your choice)":"no behavioural recommendations"}, limited data retention.</div>
+   </div>
+   <div class="foot-in">
+     <button class="btn primary" data-next>See Aarav's app →</button>
+     <button class="btn ghost" data-goto="9">Open my dashboard</button>
+   </div>`},
+
+ // 8 supervised feed
+ {device:"Kid's device",html:()=>head(false,"Supervised")+`
+   <div class="body">
+     <div class="title" style="font-size:18px">Welcome, Aarav 👋</div>
+     <div class="sub" style="margin-bottom:14px">Videos from verified channels${st.search?" · search on":""}.</div>
+     <div class="vgrid">
+       <div class="vid"><div class="thumb" style="background:#FCEDE9">🚀</div><p>How rockets reach space</p></div>
+       <div class="vid"><div class="thumb" style="background:#EAF3EA">🦖</div><p>Dinosaurs: what we got wrong</p></div>
+       <div class="vid"><div class="thumb" style="background:#EDF0FA">♟️</div><p>Chess traps for beginners</p></div>
+       <div class="vid"><div class="thumb" style="background:#FBF3E2">🌋</div><p>Inside an active volcano</p></div>
+     </div>
+     <div style="font-size:11px;color:var(--muted);margin-top:14px">Contextual ads only · no watch-history profiling · data auto-deleted when no longer needed.</div>
+   </div>
+   <div class="foot-in"><button class="btn ghost" data-goto="9">View as parent →</button></div>`},
+
+ // 9 parent dashboard (finale)
+ {device:"Parent's device",html:()=>head(false,"Parent")+`
+   <div class="body">
+     <div class="title" style="font-size:19px">Aarav's privacy</div>
+     <div class="sub" style="margin-bottom:14px">Consent given by you (verified) · 03 Jul 2026</div>
+     <div class="dcard">
+       <h4>Your consents <span class="st">Active</span></h4>
+       <div class="kv"><span>Search</span><span>${st.search?"On":"Off"}</span></div>
+       <div class="kv"><span>Recommendations</span><span>${st.recs?"On (your choice)":"Off (default)"}</span></div>
+       <div class="kv"><span>Voice search</span><span>${st.voice?"On":"Off"}</span></div>
+       <div class="kv"><span>Personalised ads</span><span>Never (under 18)</span></div>
+     </div>
+     <div class="dcard">
+       <h4>Your rights</h4>
+       <div class="kv"><span>Change any consent</span><span class="lk" data-goto="6">Edit</span></div>
+       <div class="kv"><span>Download data</span><span class="lk" data-alert="Mock: export requested. You'd receive a copy within a few days.">Request</span></div>
+       <div class="kv"><span>Delete data</span><span class="lk" data-alert="Mock: deletion requested. Fulfilled within the 90-day SLA; notified 48h before erasure.">Request</span></div>
+       <div class="kv"><span>Withdraw all consent</span><span class="lk" data-alert="Mock: consent withdrawn in one tap. Account moves to limited mode — not deleted — and processing stops.">Withdraw</span></div>
+     </div>
+     <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:4px">🎉 End of happy path — tap Restart to run it again.</div>
+   </div>`},
+];
+
+let i=0;
+function render(){
+  const s=screens[i];
+  deviceTag.innerHTML=`<span>${s.device}</span>`;
+  screen.innerHTML=`<div class="tapzone" id="tapzone"></div>`+s.html();
+  // progress dots
+  progress.innerHTML=screens.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("");
+  // wire explicit buttons
+  screen.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();next();}));
+  screen.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();goto(+b.dataset.goto);}));
+  screen.querySelectorAll("[data-alert]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();alert(b.dataset.alert);}));
+  // tapzone = advance (only if a linear next exists and no explicit-only screen)
+  const tz=document.getElementById("tapzone");
+  tz.addEventListener("click",()=>{ if(i<screens.length-1) next(); });
+  if(s.after) s.after();
+}
+function next(){ if(i<screens.length-1){i++;render();} }
+function goto(n){ i=Math.max(0,Math.min(screens.length-1,n)); render(); }
+
+document.getElementById("back").addEventListener("click",()=>{ if(i>0){i--;render();} });
+document.getElementById("restart").addEventListener("click",()=>{ i=0; st.search=true; st.recs=false; st.voice=true; render(); });
+document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight")next(); if(e.key==="ArrowLeft"&&i>0){i--;render();} });
+
+render();
+</script>
+</body>
+</html>
